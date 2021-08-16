@@ -1,4 +1,5 @@
 import json
+import os.path
 import random
 
 import dnd.err
@@ -12,6 +13,20 @@ if TYPE_CHECKING:
     from dnd.jsonutil import Number
 
 
+def _pathparts(path: "str") -> "list[str]":
+    parts = list()
+
+    remainder, part = os.path.split(path)
+    parts.append(part)
+    while remainder != "":
+        remainder, part = os.path.split(remainder)
+        parts.append(part)
+        if remainder == "/":
+            parts.append("/")
+            break
+    return parts
+
+
 class Row(object):
     @staticmethod
     def fromjson(
@@ -22,9 +37,7 @@ class Row(object):
             return None
 
         desc = dnd.jsonutil.require_string(datadict, "desc", errh)
-        weight = dnd.jsonutil.optional_number(datadict, "weight", errh)
-        if weight is None:
-            weight = 1.0
+        weight = dnd.jsonutil.optional_number(datadict, "weight", 1.0, errh)
 
         return Row(weight, desc)
 
@@ -84,22 +97,50 @@ class Table(object):
     def load_json(
         filename: "str", errh: "dnd.err.Handler" = dnd.err.DefaultHandler
     ) -> "Optional[Tuple[Optional[str], Dict[str, Table]]]":
+        loaded = set()
+        dname, fname = os.path.split(filename)
+        loaded.add(fname)
+        return Table._loadjson(dname, fname, errh, loaded)
+
+    @staticmethod
+    def _loadjson(
+        dname: "str", fname: "str", errh: "dnd.err.Handler", loaded: "set[str]"
+    ) -> "Optional[Tuple[Optional[str], Dict[str, Table]]]":
         data = None
-        with open(filename, "r") as fp:
+        with open(os.path.join(dname, fname), "r") as fp:
             data = json.load(fp)
 
         obj = dnd.jsonutil.as_object(data)
         if obj is None:
             return None
 
-        default_table = dnd.jsonutil.require_string(obj, "default")
-        tables = dnd.jsonutil.require_object(obj, "tables")
+        default_table = dnd.jsonutil.require_string(obj, "default", errh)
+        tables = dnd.jsonutil.require_object(obj, "tables", errh)
         if default_table is None or tables is None:
             return None
 
         tbls = dict()
         for name, tbldata in tables.items():
             tbls[name] = Table.fromjson(name, tbldata)
+
+        references = dnd.jsonutil.optional_array(obj, "references", None, errh)
+        if references is not None:
+            errh.push("references")
+            for i, refname in enumerate(references):
+                if refname in loaded:
+                    continue
+                if ".." in _pathparts(refname):
+                    errh.error_with("table reference may not include '..'", i)
+                loaded.add(refname)
+                rtables = Table._loadjson(dname, refname, errh, loaded)
+                if rtables is None:
+                    continue
+
+                for name, tbl in rtables[1].items():
+                    if name in tbls:
+                        raise ValueError("duplicate table name {}".format(name))
+                    tbls[name] = tbl
+            errh.pop()
 
         return default_table, tbls
 

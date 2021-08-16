@@ -1,0 +1,18 @@
+{
+  "default": "treasure-small",
+  "references": [
+      "potions.json"
+  ],
+  "tables": {
+    "treasure-small": [
+        {"weight": 2, "desc": "{{treasure-small-potion}}"},
+        {"weight": 4, "desc": "{{50d3}} gp"}
+    ],
+    "treasure-small-potion": [
+      {"weight": 1, "desc": "2 {{ potions-1st-price }}"},
+      {"weight": 2, "desc": "{{ potions-1st-price }} and {{ potions-1st-price }}"},
+      {"weight": 3, "desc": "4 {{ potions-0th-price }}"},
+      {"weight": 1, "desc": "{{potions-0th-price}}, {{potions-0th-price}}, {{potions-0th-price}}, and {{potions-0th-price}}"}
+    ]
+  }
+}
