@@ -3,11 +3,13 @@ import random
 
 import dnd.err
 import dnd.jsonutil
+import dnd.parse
 
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from typing import Any, Dict, List, Optional, Tuple, Union
+    from dnd.jsonutil import Number
 
 
 class Row(object):
@@ -19,26 +21,15 @@ class Row(object):
         if datadict is None:
             return None
 
-        desc = dnd.jsonutil.optional_string(datadict, "desc")
-        subtable = dnd.jsonutil.optional_string(datadict, "subtable")
-        weight = dnd.jsonutil.require_number(datadict, "weight")
+        desc = dnd.jsonutil.require_string(datadict, "desc", errh)
+        weight = dnd.jsonutil.optional_number(datadict, "weight", errh)
         if weight is None:
-            return None
+            weight = 1.0
 
-        if desc is None and subtable is None:
-            errh.error("one of 'desc' or 'subtable' must be defined")
-            return None
+        return Row(weight, desc)
 
-        return Row(weight, desc, subtable)
-
-    def __init__(
-        self,
-        weight: "dnd.jsonutil.Number",
-        desc: "Optional[str]",
-        subtable: "Optional[str]",
-    ) -> None:
+    def __init__(self, weight: "Number", desc: "Optional[str]") -> None:
         self._desc = desc
-        self._subtable = subtable
         self._weight = float(weight)
 
     @property
@@ -49,14 +40,33 @@ class Row(object):
     def weight(self) -> "dnd.jsonutil.Number":
         return self._weight
 
-    @property
-    def subtable(self) -> "Optional[str]":
-        return self._subtable
+    def evaluate(self, tables: "dict[str, Table]") -> "str":
+        result = ""
+        rest = self._desc
+        while "{{" in rest:
+            start = rest.index("{{")
+            end = rest.index("}}", start + 2)
+            statement = rest[start + 2 : end].strip()
+            result += rest[0:start]
+            rest = rest[end + 2 :]
+            if statement in tables:
+                result += Table.evaluate(statement, tables)
+            else:
+                try:
+                    result += str(dnd.parse.expression(statement)())
+                except ValueError:
+                    print(
+                        "no table '{}' found while evaluating table row".format(
+                            statement
+                        )
+                    )
+                    result += "<ERROR>"
+
+        result += rest
+        return result
 
     def __repr__(self) -> "str":
-        return "Row({}, {}, {})".format(
-            repr(self._desc), repr(self._weight), repr(self._subtable)
-        )
+        return "Row({}, {})".format(repr(self._desc), repr(self._weight))
 
     def __str__(self) -> "str":
         return self._desc
@@ -90,6 +100,7 @@ class Table(object):
         tbls = dict()
         for name, tbldata in tables.items():
             tbls[name] = Table.fromjson(name, tbldata)
+
         return default_table, tbls
 
     @staticmethod
@@ -105,25 +116,12 @@ class Table(object):
         return tbl
 
     @staticmethod
-    def evaluate(name: "str", tables: "dict[str, Table]") -> "list[str]":
-        results = list()
+    def evaluate(name: "str", tables: "dict[str, Table]") -> "str":
         table = tables.get(name, None)
         if table is None:
             raise ValueError("table {} not found".format(repr(name)))
-        row = table.random()
-        if row.description != "":
-            results.append(row.description)
 
-        while row.subtable is not None:
-            table = tables.get(row.subtable, None)
-            if table is None:
-                raise ValueError("table {} not found".format(repr(name)))
-
-            row = table.random()
-            if row.description != "":
-                results.append(row.description)
-
-        return results
+        return table.random().evaluate(tables)
 
     def __init__(self, id_: "str", rows: "Optional[List[Row]]" = None) -> None:
         self._id = id_

@@ -270,10 +270,7 @@ def _finishDice(count: "int", idx: "int", value: "str") -> "Tuple[int, Token]":
 
         if idx < strlen and value[idx] == "L":
             idx, droplow = scanint(idx, value)
-            return (
-                idx,
-                (_token.Dice, dnd.roll.Dice(count, sides, droplow, drophigh)),
-            )
+            return (idx, (_token.Dice, dnd.roll.Dice(count, sides, droplow, drophigh)))
 
         return (idx, (_token.Dice, dnd.roll.Dice(count, sides, 0, drophigh)))
     elif value[idx] == "L":
@@ -281,10 +278,7 @@ def _finishDice(count: "int", idx: "int", value: "str") -> "Tuple[int, Token]":
 
         if idx < strlen and value[idx] == "H":
             idx, drophigh = scanint(idx, value)
-            return (
-                idx,
-                (_token.Dice, dnd.roll.Dice(count, sides, droplow, drophigh)),
-            )
+            return (idx, (_token.Dice, dnd.roll.Dice(count, sides, droplow, drophigh)))
 
         return (idx, (_token.Dice, dnd.roll.Dice(count, sides, droplow)))
     return (idx, (_token.Dice, dnd.roll.Dice(count, sides)))

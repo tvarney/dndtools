@@ -1,0 +1,24 @@
+{
+  "default": "type",
+  "tables": {
+    "type": [
+      {"weight": 1, "desc": "Hallway: {{ hallways }}"},
+      {"weight": 2, "desc": "Trap: {{ traps }}"},
+      {"weight": 3, "desc": "Encounter: {{ encounters }}"}
+    ],
+    "hallways": [
+        {"weight": 1, "desc": "a long hallway with {{ 2+1d2 }} doors along each side"},
+        {"weight": 2, "desc": "a short hallway with {{ 1+1d2 }} doors at the end"},
+        {"weight": 1, "desc": "a cross shaped hallway with a single door at each end"}
+    ],
+    "encounters": [
+        {"weight": 1, "desc": "A small room containing {{3d2}} kobolds"},
+        {"weight": 1, "desc": "A small room containing {{3d2}} goblins"},
+        {"weight": 1, "desc": "A large room containing {{1d2}} small fire elementals"}
+    ],
+    "traps": [
+        {"weight": 1, "desc": "A short hallway with scattered pressure plates linked to a dart traps"},
+        {"weight": 1, "desc": "A long hallway with a tripwire across it linked to a pitfall trap"}
+    ]
+  }
+}

@@ -28,9 +28,7 @@ class ListView(object):
 
     def __repr__(self) -> "str":
         return "ListView({}, {}, {})".format(
-            repr(self._values),
-            repr(self._start),
-            repr(self._end),
+            repr(self._values), repr(self._start), repr(self._end)
         )
 
     def __str__(self) -> "str":
