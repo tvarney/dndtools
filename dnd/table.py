@@ -41,42 +41,21 @@ class Row(object):
 
         return Row(weight, desc)
 
-    def __init__(self, weight: "Number", desc: "Optional[str]") -> None:
-        self._desc = desc
+    def __init__(self, weight: "Number", desc: "str") -> None:
+        self._template = dnd.parse.Template(desc)
         self._weight = float(weight)
 
     @property
     def description(self) -> "str":
-        return self._desc if self._desc is not None else ""
+        return self._template.text
 
     @property
     def weight(self) -> "dnd.jsonutil.Number":
         return self._weight
 
-    def evaluate(self, tables: "dict[str, Table]") -> "str":
-        result = ""
-        rest = self._desc
-        while "{{" in rest:
-            start = rest.index("{{")
-            end = rest.index("}}", start + 2)
-            statement = rest[start + 2 : end].strip()
-            result += rest[0:start]
-            rest = rest[end + 2 :]
-            if statement in tables:
-                result += Table.evaluate(statement, tables)
-            else:
-                try:
-                    result += str(dnd.parse.expression(statement)())
-                except ValueError:
-                    print(
-                        "no table '{}' found while evaluating table row".format(
-                            statement
-                        )
-                    )
-                    result += "<ERROR>"
-
-        result += rest
-        return result
+    @property
+    def template(self) -> "dnd.parse.Template":
+        return self._template
 
     def __repr__(self) -> "str":
         return "Row({}, {})".format(repr(self._desc), repr(self._weight))
@@ -157,12 +136,16 @@ class Table(object):
         return tbl
 
     @staticmethod
-    def evaluate(name: "str", tables: "dict[str, Table]") -> "str":
+    def evaluate(
+        name: "str",
+        variables: "Optional[dict[str, Any]]" = None,
+        tables: "Optional[dict[str, Table]]" = None,
+    ) -> "str":
         table = tables.get(name, None)
         if table is None:
             raise ValueError("table {} not found".format(repr(name)))
 
-        return table.random().evaluate(tables)
+        return table.random().template.evaluate(variables, tables)
 
     def __init__(self, id_: "str", rows: "Optional[List[Row]]" = None) -> None:
         self._id = id_

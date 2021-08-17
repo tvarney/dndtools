@@ -1,0 +1,74 @@
+{
+  "default": "gems-10-price",
+  "tables": {
+    "gems-10-price": [{"desc": "{{ gems-10 }} (10 gp)"}],
+    "gems-10": [
+      {"desc": "Azurite"},
+      {"desc": "Banded Agate"},
+      {"desc": "Blue Quartz"},
+      {"desc": "Eye Agate"},
+      {"desc": "Hematite"},
+      {"desc": "Lapis Lazuli"},
+      {"desc": "Malachite"},
+      {"desc": "Moss Agate"},
+      {"desc": "Obsidian"},
+      {"desc": "Tiger Eye"},
+      {"desc": "Turquoise"}
+    ],
+    "gems-50-price": [{"desc": "{{ gems-50 }} (50 gp)"}],
+    "gems-50": [
+      {"desc": "Bloodstone"},
+      {"desc": "Carnelian"},
+      {"desc": "Chalcedony"},
+      {"desc": "Chrysoprase"},
+      {"desc": "Citrine"},
+      {"desc": "Jasper"},
+      {"desc": "Moonstone"},
+      {"desc": "Onyx"},
+      {"desc": "Quartz"},
+      {"desc": "Sardonyx"},
+      {"desc": "Star Rose Quartz"},
+      {"desc": "Zircon"}
+    ],
+    "gems-100-price": [{"desc": "{{ gems-100 }} (100 gp)"}],
+    "gems-100": [
+        {"desc": "Amber"},
+        {"desc": "Amethyst"},
+        {"desc": "Chrysoberyl"},
+        {"desc": "Coral"},
+        {"desc": "Garnet"},
+        {"desc": "Jade"},
+        {"desc": "Jet"},
+        {"desc": "Pearl"},
+        {"desc": "Spinel"},
+        {"desc": "Tourmaline"}
+    ],
+    "gems-500-price": [{"desc": "{{ gems-500 }} (500 gp)"}],
+    "gems-500": [
+      {"desc": "Alexandrite"},
+      {"desc": "Aquamarine"},
+      {"desc": "Black Pearl"},
+      {"desc": "Blue Spinel"},
+      {"desc": "Peridot"},
+      {"desc": "Topaz"}
+    ],
+    "gems-1000-price": [{"desc": "{{ gems-1000 }} (1000 gp)"}],
+    "gems-1000": [
+      {"desc": "Black Opal"},
+      {"desc": "Blue Sapphire"},
+      {"desc": "Emerald"},
+      {"desc": "Fire Opal"},
+      {"desc": "Opal"},
+      {"desc": "Star Ruby"},
+      {"desc": "Star Sapphire"},
+      {"desc": "Yellow Sapphire"}
+    ],
+    "gems-5000-price": [{"desc": "{{ gems-5000 }} (5000 gp)"}],
+    "gems-5000": [
+      {"desc": "Black Sapphire"},
+      {"desc": "Diamond"},
+      {"desc": "Jacinth"},
+      {"desc": "Ruby"}
+    ]
+  }
+}

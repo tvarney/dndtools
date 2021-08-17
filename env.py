@@ -30,7 +30,7 @@ def table(name, group=None):
         for g in _tables:
             if name in g:
                 group = g
-    return Table.evaluate(name, group)
+    return Table.evaluate(name, None, group)
 
 
 def gen_statblock():
