@@ -1,9 +1,9 @@
-
 from dnd.roll import Dice
 import dnd.parse
 from dnd.table import Table
 
 from typing import TYPE_CHECKING
+
 if TYPE_CHECKING:
     from typing import Union
 
@@ -37,9 +37,9 @@ def gen_statblock():
     return [statroll().result for _ in range(6)]
 
 
-def parse(expr: 'str'):
+def parse(expr: "str"):
     return dnd.parse.expression(expr)
 
 
-def roll(expr: 'str') -> 'Union[int, float]':
+def roll(expr: "str") -> "Union[int, float]":
     return dnd.parse.expression(expr)()
