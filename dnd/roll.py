@@ -121,8 +121,3 @@ class Dice(object):
         if self._drophigh > 0:
             return "{}d{}H{}".format(self._count, self._sides, self._drophigh)
         return "{}d{}".format(self._count, self._sides)
-
-
-def parse(expr: "str"):
-    # Tokenize the string
-    pass
