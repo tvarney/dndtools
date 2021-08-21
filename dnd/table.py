@@ -4,7 +4,7 @@ import random
 
 import dnd.err
 import dnd.jsonutil
-import dnd.parse
+import dnd.template
 
 from typing import TYPE_CHECKING
 
@@ -42,7 +42,7 @@ class Row(object):
         return Row(weight, desc)
 
     def __init__(self, weight: "Number", desc: "str") -> None:
-        self._template = dnd.parse.Template(desc)
+        self._template = dnd.template.Template(desc)
         self._weight = float(weight)
 
     @property
@@ -54,7 +54,7 @@ class Row(object):
         return self._weight
 
     @property
-    def template(self) -> "dnd.parse.Template":
+    def template(self) -> "dnd.template.Template":
         return self._template
 
     def __repr__(self) -> "str":
