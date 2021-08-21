@@ -89,7 +89,7 @@ class Writer(Handler):
 
     def error(self, err: "str") -> None:
         if self.filename != "":
-            print("{} {}: {}".format(self.filename, self.path, err, file=self._stream))
+            print("{} {}: {}".format(self.filename, self.path, err), file=self._stream)
         print("{}: {}".format(self.path, err), file=self._stream)
 
 
