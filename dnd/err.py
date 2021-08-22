@@ -1,7 +1,7 @@
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from typing import Optional, Union
+    from typing import Optional, Type, Union
 
     JsonPathElement = Union[int, float]
     JsonPath = list[JsonPathElement]
@@ -11,7 +11,10 @@ class JsonError(ValueError):
     """An error which indicates an error occured at a given json context"""
 
     def __init__(
-        self, message: "str", filepath: "Optional[str]", jsonpath: "Optional[str]"
+        self,
+        message: "str",
+        filepath: "Optional[str]" = None,
+        jsonpath: "Optional[str]" = None,
     ) -> None:
         ValueError.__init__(self, message, filepath, jsonpath)
 
@@ -34,7 +37,7 @@ class JsonError(ValueError):
 
     def __repr__(self) -> "str":
         return "dnd.err.JsonError({}, {}, {})".format(
-            self.args[0], self.args[1], self.args[2]
+            repr(self.args[0]), repr(self.args[1]), repr(self.args[2])
         )
 
 
@@ -57,10 +60,15 @@ class Handler(object):
     @property
     def path(self) -> "str":
         if self._pathrepr is None:
-            self._pathrepr = "".join(
-                ("[{}]" if type(item) is int else ".{}").format(item)
-                for item in self._path
-            )
+            if len(self._path) > 0:
+                self._pathrepr = "".join(
+                    ("[{}]" if type(item) is int else ".{}").format(item)
+                    for item in self._path
+                )
+                if self._pathrepr[0] != ".":
+                    self._pathrepr = "." + self._pathrepr
+            else:
+                self._pathrepr = "."
         return self._pathrepr
 
     def error_with(self, err: "str", key: "JsonPathElement") -> None:
@@ -68,15 +76,19 @@ class Handler(object):
         self.error(err)
         self.pop()
 
-    def error(self, err: "str") -> None:
+    def error(self, err: "Union[str,BaseException]") -> None:
         raise NotImplementedError()
 
     def push(self, key: "JsonPathElement") -> None:
         self._path.append(key)
         self._pathrepr = None
 
-    def pop(self, n: "int" = 0) -> None:
-        remove = min(n, len(self._path))
+    def extend(self, *keys: "JsonPathElement") -> None:
+        self._path.extend(keys)
+        self._pathrepr = None
+
+    def pop(self, n: "int" = 1) -> None:
+        remove = min(max(n, 1), len(self._path))
         for _ in range(remove):
             self._path.pop()
         self._pathrepr = None
@@ -87,19 +99,28 @@ class Writer(Handler):
         Handler.__init__(self)
         self._stream = stream
 
-    def error(self, err: "str") -> None:
-        if self.filename != "":
-            print("{} {}: {}".format(self.filename, self.path, err), file=self._stream)
-        print("{}: {}".format(self.path, err), file=self._stream)
+    def error(self, err: "Union[str,BaseException]") -> None:
+        if isinstance(err, BaseException):
+            err = "{}: {}".format(type(err).__name__, str(err))
+
+        f, p = self.filename, self.path
+        if f == "":
+            print("{}: {}".format(p, err), file=self._stream)
+        else:
+            print("{} {}: {}".format(f, p, err), file=self._stream)
 
 
 class Raiser(Handler):
-    def __init__(self, errtype: "type") -> None:
+    def __init__(self, raisefn: 'Optional[callable[[Handler, str], BaseException]]' = None) -> None:
         Handler.__init__(self)
-        self._errtype = errtype
+        if raisefn is None:
+            raisefn = lambda h, s: JsonError(s, h.filename, h.path)
+        self._constructor = raisefn # type: callable[[Handler, str], BaseException]
 
-    def error(self, err: "str") -> None:
-        raise self._errtype(err)
+    def error(self, err: "Union[str,BaseException]") -> None:
+        if isinstance(err, BaseException):
+            raise err
+        raise self._constructor(self, err)
 
 
-DefaultHandler = Raiser(ValueError)
+DefaultHandler = Raiser()
