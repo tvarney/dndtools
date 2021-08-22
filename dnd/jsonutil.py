@@ -44,7 +44,7 @@ def typename(value: "Any") -> "str":
     typename = _typenames.get(t, None)
     if typename is not None:
         return typename
-    return "python!{}".format(t)
+    return "python!{}".format(t.__name__)
 
 
 def check_keys(

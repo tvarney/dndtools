@@ -94,9 +94,10 @@ class TestHandler(unittest.TestCase):
 
 class TestWriter(unittest.TestCase):
     def _test(
-        self, errmsg: "Union[str,BaseException]",
+        self,
+        errmsg: "Union[str,BaseException]",
         filename: "Optional[str]" = None,
-        path: "Optional[list[dnd.err.JsonPathElement]]" = None
+        path: "Optional[list[dnd.err.JsonPathElement]]" = None,
     ) -> "str":
         stream = io.StringIO()
         w = dnd.err.Writer(stream)
@@ -119,11 +120,11 @@ class TestWriter(unittest.TestCase):
     def test_error_path(self):
         result = self._test("error", None, ["a", "b", 1])
         self.assertEqual(result, ".a.b[1]: error\n")
-    
+
     def test_error_filename_and_path(self):
         result = self._test("error", "test.json", ["a", 3, "c"])
         self.assertEqual(result, "test.json .a[3].c: error\n")
-    
+
     def test_error_with_exception(self):
         result = self._test(KeyError("key"), "test.json", ["a", 3, "c"])
         self.assertEqual(result, "test.json .a[3].c: KeyError: 'key'\n")

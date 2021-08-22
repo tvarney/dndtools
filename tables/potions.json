@@ -16,7 +16,7 @@
         {"weight": 2,  "desc": "Potion of Stabilize"},
         {"weight": 1,  "desc": "Potion of Virtue"}
     ],
-    "potions-0th-mystery": [{"desc": "{{ potions-mystery-desc }} {{ potions-1st-price }}"}],
+    "potions-1st-mystery": [{"desc": "{{ potions-mystery-desc }} {{ potions-1st-price }}"}],
     "potions-1st-price": [{"desc": "{{ potions-1st }} (50 gp)"}],
     "potions-1st": [
         {"weight": 25, "desc": "Potion of Cure Light Wounds [1d8+1 hp]"},
