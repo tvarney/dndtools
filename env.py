@@ -21,8 +21,9 @@ statroll = Dice(4, 6, 1)
 _, maze = Table.load("tables/maze.json")
 _, potions = Table.load("tables/potions.json")
 _, treasure = Table.load("tables/treasure.json")
+_, magic_weapons = Table.load("tables/magic-weapons.json")
 
-_tables = [maze, potions, treasure]
+_tables = [maze, potions, treasure, magic_weapons]
 
 
 def table(name, group=None):
