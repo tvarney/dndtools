@@ -111,11 +111,13 @@ class Writer(Handler):
 
 
 class Raiser(Handler):
-    def __init__(self, raisefn: 'Optional[callable[[Handler, str], BaseException]]' = None) -> None:
+    def __init__(
+        self, raisefn: "Optional[callable[[Handler, str], BaseException]]" = None
+    ) -> None:
         Handler.__init__(self)
         if raisefn is None:
             raisefn = lambda h, s: JsonError(s, h.filename, h.path)
-        self._constructor = raisefn # type: callable[[Handler, str], BaseException]
+        self._constructor = raisefn  # type: callable[[Handler, str], BaseException]
 
     def error(self, err: "Union[str,BaseException]") -> None:
         if isinstance(err, BaseException):
